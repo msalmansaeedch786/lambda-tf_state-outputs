@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Custom Resource Provider - Single Value
+Parameters:
+  CustomResourcesFunction:
+    Description: The Lambda function name of the NorthBay Labs custom resources provider. Defaults to CFNCustomResourcesFunction
+    Type: String
+    Default: ddc_aws_lambda_function
+  BucketName:
+    Description: Bucket Name
+    Type: String
+    Default: ddc-arbitrary-terraform-state-files
+  BucketKey:
+    Description: Bucket Key
+    Type: String
+    Default: sample_state_file.tfstate
+  OutputValue:
+    Description: Output Value
+    Type: String
+    Default: 'load_balancer_arn'
+
+Resources:
+  GetLoadBalancerARN:
+    Type: AWS::CloudFormation::CustomResource
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}'
+      BucketName: !Ref 'BucketName'
+      BucketKey: !Ref 'BucketKey'
+      OutputValue: !Ref 'OutputValue'
+
+Outputs:
+  LoadBalancerARN:
+    Value: !GetAtt 'GetLoadBalancerARN.load_balancer_arn'

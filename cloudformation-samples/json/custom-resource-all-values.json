@@ -1,0 +1,72 @@
+{
+   "AWSTemplateFormatVersion": "2010-09-09",
+   "Description": "AWS CloudFormation Custom Resource Provider - All Values",
+   "Parameters": {
+     "CustomResourcesFunction": {
+       "Description": "The Lambda function name of the NorthBay Labs custom resources provider. Defaults to CFNCustomResourcesFunction.",
+       "Type": "String",
+       "Default": "ddc_aws_lambda_function"
+     },
+     "BucketName": {
+       "Description": "Bucket Name",
+       "Type": "String",
+       "Default": "ddc-arbitrary-terraform-state-files"
+     },
+     "BucketKey": {
+       "Description": "Bucket Key",
+       "Type": "String",
+       "Default": "sample_state_file.tfstate"
+     },
+     "OutputValue": {
+       "Description": "Output Value",
+       "Type": "String",
+       "Default": ""
+     }
+   },
+   "Resources": {
+     "GetLoadBalancerARN": {
+       "Type": "AWS::CloudFormation::CustomResource",
+       "DeletionPolicy": "Delete",
+       "UpdateReplacePolicy": "Delete",
+       "Properties": {
+         "ServiceToken": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}",
+         "BucketName": "BucketName",
+         "BucketKey": "BucketKey",
+         "OutputValue": "OutputValue"
+       }
+     },
+     "GetS3BucketARN": {
+       "Type": "AWS::CloudFormation::CustomResource",
+       "DeletionPolicy": "Delete",
+       "UpdateReplacePolicy": "Delete",
+       "Properties": {
+         "ServiceToken": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}",
+         "BucketName": "BucketName",
+         "BucketKey": "BucketKey",
+         "OutputValue": "OutputValue"
+       }
+     },
+     "GetIAMPolicyARN": {
+       "Type": "AWS::CloudFormation::CustomResource",
+       "DeletionPolicy": "Delete",
+       "UpdateReplacePolicy": "Delete",
+       "Properties": {
+         "ServiceToken": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}",
+         "BucketName": "BucketName",
+         "BucketKey": "BucketKey",
+         "OutputValue": "OutputValue"
+       }
+     }
+   },
+   "Outputs": {
+     "LoadBalancerARN": {
+       "Value": "GetLoadBalancerARN.load_balancer_arn"
+     },
+     "IAMPolicyARN": {
+       "Value": "GetLoadBalancerARN.iam_policy_arn"
+     },
+     "S3BucketARN": {
+       "Value": "GetLoadBalancerARN.s3_bucket_arn"
+     }
+   }
+ }
