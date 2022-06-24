@@ -1,6 +1,9 @@
+import sys
 import json
-import boto3
-import cfnresponse
+import boto3 
+
+sys.path.append('./lib')
+import cfn_resource_response
 
 def handler(event, context):
     try:
@@ -15,13 +18,12 @@ def handler(event, context):
             bucket_key = resource_properties.get('BucketKey', None)
             desired_output = resource_properties.get('DesiredOutput', None)
 
+            response_data = {}
             if bucket_name and bucket_key:
                 
                 # download terraform state file
                 s3.meta.client.download_file(bucket_name, bucket_key, '/tmp/state_file.tfstate')
                 state_file = json.load(open('/tmp/state_file.tfstate'))
-
-                response_data = {}
                 
                 # desired output exists
                 if desired_output and desired_output != '':
@@ -33,17 +35,17 @@ def handler(event, context):
                     for key in outputs.keys():
                         response_data[key] = outputs[key]['value']
 
-                cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data)
+                cfn_resource_response.send(event, context, 'SUCCESS', response_data)
 
             else:
-                cfnresponse.send(event, context, cfnresponse.FAILED, {'Reason': 'Bucket name or key not provided'})
+                cfn_resource_response.send(event, context, 'FAILED', {'Reason': 'Bucket name or key not provided'})
 
         # Delete Request
         elif event['RequestType'] == 'Delete':
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, {'message': 'RequestType::Delete'})
+            cfn_resource_response.send(event, context, 'SUCCESS', {'message': 'RequestType::Delete'})
 
         else:
-            cfnresponse.send(event, context, cfnresponse.FAILED, {'Reason': 'RequestType is not supported'})
+            cfn_resource_response.send(event, context, 'FAILED', {'Reason': 'RequestType is not supported'})
 
     except Exception as error:
-        cfnresponse.send(event, context, cfnresponse.FAILED, {'Reason': error})
+        cfn_resource_response.send(event, context, 'FAILED', {'Reason': error})

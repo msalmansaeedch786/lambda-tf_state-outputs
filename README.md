@@ -55,11 +55,7 @@ This project comprises 4 main folders (below are the details):
 
 9. Creating the Payload for Lambda Function
 
-   * `cd src && pip3 install --target payload cfnresponse`
-
-   * `cd payload && zip -r ../payload.zip .`
-
-   * `cd .. && zip -g payload.zip index.py && cd ..`
+   * `cd src && zip -r ./payload.zip . -x ".*" -x "__MACOSX" && cd ..`
 
 10. Update terraform configurations for infrastructure deployment
 

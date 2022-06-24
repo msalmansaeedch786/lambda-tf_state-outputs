@@ -1,11 +1,6 @@
-#  Copyright 2016 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.
-#  SPDX-License-Identifier: Apache-2.0
-
-import urllib3
 import json
+import urllib3
 http = urllib3.PoolManager()
-SUCCESS = "SUCCESS"
-FAILED = "FAILED"
 
 def send(event, context, responseStatus, responseData, physicalResourceId=None, noEcho=False):
     responseUrl = event['ResponseURL']
@@ -32,7 +27,6 @@ def send(event, context, responseStatus, responseData, physicalResourceId=None, 
     }
 
     try:
-        
         response = http.request('PUT',responseUrl,body=json_responseBody.encode('utf-8'),headers=headers)
         print("Status code: " + response.reason)
     except Exception as e:
