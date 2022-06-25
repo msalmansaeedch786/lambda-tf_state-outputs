@@ -67,7 +67,7 @@ This project comprises 4 main folders (below are the details):
       region = "AWS_REGION" // us-east-1
    }
    ```
-- Update `infrastructure/terraform.tfvars` file with region and arbitrary terraform state files bucket name
+- Update `infrastructure/terraform.tfvars` file with region and arbitrary terraform state files bucket name (assumption: the bucket should already exist with sample terraform state files)
 
    ***Note***: `sample_state_file.tfstate` is in root folder director which can be used as input
    ```json
