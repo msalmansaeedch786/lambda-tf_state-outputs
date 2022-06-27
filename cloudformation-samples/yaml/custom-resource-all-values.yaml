@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS CloudFormation Custom Resource Provider - All Values
 Parameters:
   CustomResourcesFunction:
-    Description: The Lambda function name of the NorthBay Labs custom resources provider. Defaults to CFNCustomResourcesFunction.
+    Description: The Lambda function name of the custom resources provider. Defaults to CFNCustomResourcesFunction
     Type: String
     Default: ddc_aws_lambda_function
   BucketName:
@@ -13,8 +13,8 @@ Parameters:
     Description: Bucket Key
     Type: String
     Default: sample_state_file.tfstate
-  OutputValue:
-    Description: Output Value
+  DesiredOutput:
+    Description: Desired Output
     Type: String
     Default: ''
 
@@ -27,7 +27,7 @@ Resources:
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}'
       BucketName: !Ref 'BucketName'
       BucketKey: !Ref 'BucketKey'
-      OutputValue: !Ref 'OutputValue'
+      DesiredOutput: !Ref 'DesiredOutput'
   GetS3BucketARN:
     Type: AWS::CloudFormation::CustomResource
     DeletionPolicy: Delete
@@ -36,7 +36,7 @@ Resources:
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}'
       BucketName: !Ref 'BucketName'
       BucketKey: !Ref 'BucketKey'
-      OutputValue: !Ref 'OutputValue'
+      DesiredOutput: !Ref 'DesiredOutput'
   GetIAMPolicyARN:
     Type: AWS::CloudFormation::CustomResource
     DeletionPolicy: Delete
@@ -45,7 +45,7 @@ Resources:
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}'
       BucketName: !Ref 'BucketName'
       BucketKey: !Ref 'BucketKey'
-      OutputValue: !Ref 'OutputValue'
+      DesiredOutput: !Ref 'DesiredOutput'
 
 Outputs:
   LoadBalancerARN:

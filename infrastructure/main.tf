@@ -27,9 +27,9 @@ resource "aws_iam_role" "ddc_aws_iam_role" {
 // AWS IAM Policy
 
 resource "aws_iam_policy" "ddc_aws_iam_policy" {
-  name        = "ddc_aws_iam_policy"
+  name        = "ddc-aws-iam-policy"
   path        = "/"
-  description = "ddc_aws_iam_policy"
+  description = "IAM policy for logging from a lambda"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -38,12 +38,11 @@ resource "aws_iam_policy" "ddc_aws_iam_policy" {
     Statement = [
       {
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = "${aws_cloudwatch_log_group.ddc_aws_cloudwatch_log_group.arn}:*"
       },
       {
         Action = "s3:GetObject",
@@ -59,6 +58,13 @@ resource "aws_iam_policy" "ddc_aws_iam_policy" {
 resource "aws_iam_role_policy_attachment" "ddc_aws_iam_role_policy_attachment" {
   role       = aws_iam_role.ddc_aws_iam_role.name
   policy_arn = aws_iam_policy.ddc_aws_iam_policy.arn
+}
+
+// AWS CloudWatch Log Group
+
+resource "aws_cloudwatch_log_group" "ddc_aws_cloudwatch_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.ddc_aws_lambda_function.function_name}"
+  retention_in_days = 14
 }
 
 // AWS Lambda Fucntion 

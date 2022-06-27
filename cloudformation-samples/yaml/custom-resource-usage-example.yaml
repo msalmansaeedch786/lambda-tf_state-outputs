@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation Custom Resource Provider - Single Value
+Description: AWS CloudFormation Custom Resource Provider - Usage Example
 Parameters:
   CustomResourcesFunction:
     Description: The Lambda function name of the custom resources provider. Defaults to CFNCustomResourcesFunction
@@ -16,10 +16,10 @@ Parameters:
   DesiredOutput:
     Description: Desired Output
     Type: String
-    Default: 'load_balancer_arn'
+    Default: 's3_bucket_arn'
 
 Resources:
-  GetLoadBalancerARN:
+  GetS3BucketARN:
     Type: AWS::CloudFormation::CustomResource
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
@@ -28,7 +28,31 @@ Resources:
       BucketName: !Ref 'BucketName'
       BucketKey: !Ref 'BucketKey'
       DesiredOutput: !Ref 'DesiredOutput'
-
+  
+  RootRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: !GetAtt GetS3BucketARN.s3_bucket_arn
+                
 Outputs:
+  IAMRoleARN:
+    Value: !GetAtt RootRole.Arn
   LoadBalancerARN:
-    Value: !GetAtt 'GetLoadBalancerARN.load_balancer_arn'
+    Value: !GetAtt GetS3BucketARN.s3_bucket_arn

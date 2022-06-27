@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "AWS CloudFormation Custom Resource Provider - All Values",
+  "Description": "AWS CloudFormation Custom Resource Provider - Usage Example",
   "Parameters": {
     "CustomResourcesFunction": {
       "Description": "The Lambda function name of the custom resources provider. Defaults to CFNCustomResourcesFunction",
@@ -20,29 +20,10 @@
     "DesiredOutput": {
       "Description": "Desired Output",
       "Type": "String",
-      "Default": ""
+      "Default": "s3_bucket_arn"
     }
   },
   "Resources": {
-    "GetLoadBalancerARN": {
-      "Type": "AWS::CloudFormation::CustomResource",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Delete",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}"
-        },
-        "BucketName": {
-          "Ref": "BucketName"
-        },
-        "BucketKey": {
-          "Ref": "BucketKey"
-        },
-        "DesiredOutput": {
-          "Ref": "DesiredOutput"
-        }
-      }
-    },
     "GetS3BucketARN": {
       "Type": "AWS::CloudFormation::CustomResource",
       "DeletionPolicy": "Delete",
@@ -62,47 +43,62 @@
         }
       }
     },
-    "GetIAMPolicyARN": {
-      "Type": "AWS::CloudFormation::CustomResource",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Delete",
+    "RootRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
-        "ServiceToken": {
-          "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomResourcesFunction}"
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
         },
-        "BucketName": {
-          "Ref": "BucketName"
-        },
-        "BucketKey": {
-          "Ref": "BucketKey"
-        },
-        "DesiredOutput": {
-          "Ref": "DesiredOutput"
-        }
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "root",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "*",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "GetS3BucketARN",
+                      "s3_bucket_arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   },
   "Outputs": {
+    "IAMRoleARN": {
+      "Value": {
+        "Fn::GetAtt": [
+          "RootRole",
+          "Arn"
+        ]
+      }
+    },
     "LoadBalancerARN": {
       "Value": {
         "Fn::GetAtt": [
-          "GetLoadBalancerARN",
-          "load_balancer_arn"
-        ]
-      }
-    },
-    "IAMPolicyARN": {
-      "Value": {
-        "Fn::GetAtt": [
-          "GetLoadBalancerARN",
-          "iam_policy_arn"
-        ]
-      }
-    },
-    "S3BucketARN": {
-      "Value": {
-        "Fn::GetAtt": [
-          "GetLoadBalancerARN",
+          "GetS3BucketARN",
           "s3_bucket_arn"
         ]
       }
